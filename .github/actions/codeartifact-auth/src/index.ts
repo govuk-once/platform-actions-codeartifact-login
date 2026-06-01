@@ -34,7 +34,7 @@ async function run(): Promise<void> {
     
     core.info(`Authenticating with CodeArtifact domain: ${inputs.codeartifactDomain}`);
     core.info(`Using AWS region: ${inputs.awsRegion}`);
-    const idToken = await core.getIDToken();
+    const idToken = await core.getIDToken('sts.amazonaws.com');
     const awsCredentials = await authenticateWithOIDCToken(idToken, inputs.roleToAssume, inputs.awsRegion);
     core.info('Successfully obtained AWS credentials via OIDC');
     
