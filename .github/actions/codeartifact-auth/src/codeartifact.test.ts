@@ -22,6 +22,7 @@ describe('codeartifact', () => {
         .mockResolvedValueOnce({ repositoryEndpoint: 'https://registry.codeartifact.example.com/npm/registry-prod/' });
 
       const domain = 'registry-prod';
+      const repository = 'registry-prod-repo';
       const domainOwner = '123456789012';
       const credentials = {
         accessKeyId: 'AKIAIOSFODNN7EXAMPLE',
@@ -33,6 +34,7 @@ describe('codeartifact', () => {
 
       const result = await codeartifactModule.getCodeArtifactTokenAndUrl(
         domain,
+        repository,
         domainOwner,
         credentials,
         region

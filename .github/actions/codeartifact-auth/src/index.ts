@@ -6,6 +6,7 @@ import { configurePackageManager } from './config';
 export interface ActionInputs {
   packageManager: 'npm' | 'pnpm';
   codeartifactDomain: string;
+  codeartifactRepository: string;
   codeartifactDomainOwner: string;
   awsRegion: string;
   roleToAssume: string;
@@ -20,6 +21,7 @@ function parseInputs(): ActionInputs {
   return {
     packageManager,
     codeartifactDomain: core.getInput('codeartifact-domain', { required: false }) || 'registry-prod',
+    codeartifactRepository: core.getInput('codeartifact-repository', { required: false }) || 'npm',
     codeartifactDomainOwner: core.getInput('codeartifact-domain-owner', { required: true }),
     awsRegion: awsRegion || 'eu-west-2',
     roleToAssume: core.getInput('role-to-assume', { required: true })
@@ -32,16 +34,18 @@ async function run(): Promise<void> {
     
     core.info(`Authenticating with CodeArtifact domain: ${inputs.codeartifactDomain}`);
     core.info(`Using AWS region: ${inputs.awsRegion}`);
-    
-    const awsCredentials = await authenticateWithOIDCToken(inputs.roleToAssume, inputs.awsRegion);
+    const idToken = await core.getIDToken();
+    const awsCredentials = await authenticateWithOIDCToken(idToken, inputs.roleToAssume, inputs.awsRegion);
     core.info('Successfully obtained AWS credentials via OIDC');
     
     const { authToken, registryUrl } = await getCodeArtifactTokenAndUrl(
       inputs.codeartifactDomain,
+      inputs.codeartifactRepository,
       inputs.codeartifactDomainOwner,
       awsCredentials,
       inputs.awsRegion
     );
+  
     core.info(`Successfully obtained CodeArtifact token and registry URL: ${registryUrl.substring(0, 8)}...`);
     
     await configurePackageManager(inputs.packageManager, registryUrl, authToken);

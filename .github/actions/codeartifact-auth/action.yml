@@ -9,9 +9,14 @@ inputs:
     description: 'CodeArtifact domain name'
     required: false
     default: 'registry-prod'
+  codeartifact-repository:
+    description: 'CodeArtifact repo name'
+    required: false
+    default: 'registry-prod-repo'
   codeartifact-domain-owner:
     description: 'AWS account ID that owns the CodeArtifact domain'
-    required: true
+    required: false
+    default: 904690835784
   aws-region:
     description: 'AWS region for CodeArtifact operations'
     required: false
