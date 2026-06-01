@@ -1,0 +1,21 @@
+name: refresh-codeartifact-token
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Assume AWS Role
+        uses: ./.github/actions/codeartifact-auth
+        with:
+          role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact # TODO: replace with your role ARN
+          region: eu-west-2
+          domain: registry-prod
+          domain-owner: 904690835784 # TODO: replace with your AWS account ID

@@ -1,0 +1,4 @@
+# Node version compatibility
+node:
+  version: '18.20.3'
+  engine-strict: true
