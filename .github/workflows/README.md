@@ -6,7 +6,7 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 
 ```yaml
 - name: Configure CodeArtifact
-  uses: ./.github/actions/codeartifact-auth
+  uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@717aab3ceeeea67948259bd6fe54d75be065b58a 
   with:
     role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact
     package-manager: pnpm
@@ -49,7 +49,7 @@ jobs:
           registry-url: 'https://repo-prod-904690835784.d.codeartifact.eu-west-2.amazonaws.com/npm/registry-prod-repo/'
       
       - name: Configure CodeArtifact
-        uses: ./.github/actions/codeartifact-auth
+        uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@717aab3ceeeea67948259bd6fe54d75be065b58a 
         with:
           role-to-assume: ${{ secrets.GH_DEPLOYER_ROLE }}
       
