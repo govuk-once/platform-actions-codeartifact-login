@@ -9,10 +9,7 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
   uses: ./.github/actions/codeartifact-auth
   with:
     role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact
-    region: eu-west-2
-    domain: registry-prod
-    domain-owner: 904690835784 
-    package-manager: npm
+    package-manager: pnpm
 ```
 
 ### Input Parameters
@@ -51,13 +48,10 @@ jobs:
           node-version: 'lts/*'
           registry-url: 'https://repo-prod-904690835784.d.codeartifact.eu-west-2.amazonaws.com/npm/registry-prod-repo/'
       
-      - name: Configure CodeArtifact auth
+      - name: Configure CodeArtifact
         uses: ./.github/actions/codeartifact-auth
         with:
-          role-to-assume: arn:aws:iam::(your-account):role/gh-deployer-role
-          region: eu-west-2
-          domain: registry-prod
-          domain-owner: 904690835784
+          role-to-assume: ${{ secrets.GH_DEPLOYER_ROLE }}
       
       - name: Install dependencies
         run: npm ci
