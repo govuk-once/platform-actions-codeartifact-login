@@ -22,19 +22,19 @@ jobs:
       - name: Install dependencies
         run: |
           cd .github/actions/codeartifact-auth
-          npm ci
+          pnpm ci
 
       - name: Run lint
         run: |
           cd .github/actions/codeartifact-auth
-          npm run lint
+          pnpm run lint
 
       - name: Run tests
         run: |
           cd .github/actions/codeartifact-auth
-          npm test
+          pnpm test
 
       - name: Build
         run: |
           cd .github/actions/codeartifact-auth
-          npm run build
+          pnpm run build
