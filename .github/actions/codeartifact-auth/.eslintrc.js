@@ -7,7 +7,6 @@ module.exports = {
     }
   },
   rules: {
-    'no-console': 'error',
     'no-unused-vars': 'error'
   },
   env: {
