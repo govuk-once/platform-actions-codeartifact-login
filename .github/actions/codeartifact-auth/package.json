@@ -22,10 +22,10 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@aws-sdk/client-codeartifact": "^3.624.0",
-    "@aws-sdk/client-sts": "^3.624.0",
-    "@types/node": "^20.14.0"
+    "@aws-sdk/client-sts": "^3.624.0"
   },
   "devDependencies": {
+    "@types/node": "^20.14.0",
     "@typescript-eslint/eslint-plugin": "^7.14.0",
     "@typescript-eslint/parser": "^7.14.0",
     "eslint": "^8.57.0",
@@ -36,6 +36,6 @@
     "@vercel/ncc": "^0.38.4"
   },
   "engines": {
-    "node": "18.20.3"
+    "node": "24"
   }
 }
