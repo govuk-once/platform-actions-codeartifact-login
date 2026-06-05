@@ -6,13 +6,10 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 
 ```yaml
 - name: Configure CodeArtifact
-  uses: ./.github/actions/codeartifact-auth
+  uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@717aab3ceeeea67948259bd6fe54d75be065b58a 
   with:
     role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact
-    region: eu-west-2
-    domain: registry-prod
-    domain-owner: 904690835784 
-    package-manager: npm
+    package-manager: pnpm
 ```
 
 ### Input Parameters
@@ -20,9 +17,9 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 | Parameter | Required | Description | Default |
 |-----------|----------|-------------|---------|
 | `role-to-assume` | Yes | AWS IAM role ARN with CodeArtifact permissions | None |
-| `region` | No | AWS region | `eu-west-2` |
-| `domain` | No | CodeArtifact domain name | `registry-prod` |
-| `domain-owner` | Yes | AWS account ID that owns the domain | None |
+| `aws-region` | No | AWS region | `eu-west-2` |
+| `codeartifact-domain` | No | CodeArtifact domain name | `registry-prod` |
+| `codeartifact-domain-owner` | Yes | AWS account ID that owns the domain | None |
 | `package-manager` | No | Package manager (`npm` or `pnpm`) | `npm` |
 
 ### Output Variables
@@ -51,13 +48,10 @@ jobs:
           node-version: 'lts/*'
           registry-url: 'https://repo-prod-904690835784.d.codeartifact.eu-west-2.amazonaws.com/npm/registry-prod-repo/'
       
-      - name: Configure CodeArtifact auth
-        uses: ./.github/actions/codeartifact-auth
+      - name: Configure CodeArtifact
+        uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@717aab3ceeeea67948259bd6fe54d75be065b58a 
         with:
-          role-to-assume: arn:aws:iam::(your-account):role/gh-deployer-role
-          region: eu-west-2
-          domain: registry-prod
-          domain-owner: 904690835784
+          role-to-assume: ${{ secrets.GH_DEPLOYER_ROLE }}
       
       - name: Install dependencies
         run: npm ci

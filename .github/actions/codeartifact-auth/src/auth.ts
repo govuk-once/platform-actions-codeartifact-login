@@ -28,11 +28,12 @@ export function getGitHubOIDCTokenUrl(): string {
 }
 
 export async function authenticateWithOIDCToken(
+  idToken: string,
   roleToAssume: string,
   region: string
 ): Promise<AwsCredentials> {
-  const oidcToken = getGitHubOIDCToken();
-  getGitHubOIDCTokenUrl();
+  // const oidcToken = getGitHubOIDCToken();
+  // getGitHubOIDCTokenUrl();
   
   const stsClient = new STSClient({ 
     region,
@@ -42,13 +43,18 @@ export async function authenticateWithOIDCToken(
   const command = new AssumeRoleWithWebIdentityCommand({
     RoleArn: roleToAssume,
     RoleSessionName: 'github-actions-codeartifact',
-    WebIdentityToken: oidcToken,
+    WebIdentityToken: idToken,
     DurationSeconds: OIDC_TOKEN_DURATION_SECONDS
   });
-  
-  const response = await stsClient.send(command);
-  
+  console.info(`Assuming role ${roleToAssume} with OIDC token for AWS region ${region}`);
+  const response = await stsClient.send(command).catch(e => {
+    console.log(atob(idToken.split('.')[0]));
+    console.log(atob(idToken.split('.')[1]));
+    console.log(e);
+    throw e;
+  });
   if (!response.Credentials) {
+    console.info(response)
     throw new Error('Failed to obtain AWS credentials: no credentials returned');
   }
   

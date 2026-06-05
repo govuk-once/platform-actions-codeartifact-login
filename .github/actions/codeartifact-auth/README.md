@@ -21,8 +21,9 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 |-----------|----------|-------------|---------|
 | `role-to-assume` | Yes | AWS IAM role ARN with CodeArtifact permissions | None |
 | `region` | No | AWS region | `eu-west-2` |
-| `domain` | No | CodeArtifact domain name | `registry-prod` |
-| `domain-owner` | Yes | AWS account ID that owns the domain | None |
+| `codeartifact-domain` | No | CodeArtifact domain name | `registry-prod` |
+| `codeartifact-repository` | No | CodeArtifact Repository name  | `registry-prod-repo` |
+| `codeartifact-omain-owner` | No | AWS account ID that owns the domain | `904690835784` |
 | `package-manager` | No | Package manager (`npm` or `pnpm`) | `npm` |
 
 ### Output Variables
@@ -52,12 +53,9 @@ jobs:
           registry-url: 'https://repo-prod-904690835784.d.codeartifact.eu-west-2.amazonaws.com/npm/registry-prod-repo/'
       
       - name: Configure CodeArtifact auth
-        uses: ./.github/actions/codeartifact-auth
+        uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@ce0d38a2fb22c5f6bd8b8764a1572fbc080a52d1
         with:
-          role-to-assume: arn:aws:iam::(your-account):role/gh-deployer-role
-          region: eu-west-2
-          domain: registry-prod
-          domain-owner: 123456789012
+          role-to-assume: arn:aws:iam::01234456789:role/somerole
       
       - name: Install dependencies
         run: npm ci
