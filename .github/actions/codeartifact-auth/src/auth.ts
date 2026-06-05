@@ -32,8 +32,6 @@ export async function authenticateWithOIDCToken(
   roleToAssume: string,
   region: string
 ): Promise<AwsCredentials> {
-  // const oidcToken = getGitHubOIDCToken();
-  // getGitHubOIDCTokenUrl();
   
   const stsClient = new STSClient({ 
     region,
@@ -48,9 +46,7 @@ export async function authenticateWithOIDCToken(
   });
   console.info(`Assuming role ${roleToAssume} with OIDC token for AWS region ${region}`);
   const response = await stsClient.send(command).catch(e => {
-    console.log(atob(idToken.split('.')[0]));
-    console.log(atob(idToken.split('.')[1]));
-    console.log(e);
+    console.log("Issue assuming AWS role", e);
     throw e;
   });
   if (!response.Credentials) {
