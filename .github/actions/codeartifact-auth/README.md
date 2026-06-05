@@ -23,7 +23,7 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 | `region` | No | AWS region | `eu-west-2` |
 | `codeartifact-domain` | No | CodeArtifact domain name | `registry-prod` |
 | `codeartifact-repository` | No | CodeArtifact Repository name  | `registry-prod-repo` |
-| `codeartifact-omain-owner` | No | AWS account ID that owns the domain | `904690835784` |
+| `codeartifact-domain-owner` | No | AWS account ID that owns the domain | `904690835784` |
 | `package-manager` | No | Package manager (`npm` or `pnpm`) | `npm` |
 
 ### Output Variables
