@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 
 describe('index', () => {
   let getInputMock: jest.SpiedFunction<typeof core.getInput>;
@@ -21,7 +22,7 @@ describe('index', () => {
     jest.clearAllMocks();
   });
 
-  test('should parse inputs correctly with defaults', () => {
+  it('should parse inputs correctly with defaults', () => {
     const inputs = {
       packageManager: 'pnpm',
       codeartifactDomain: 'registry-prod',
@@ -37,7 +38,7 @@ describe('index', () => {
     expect(inputs.roleToAssume).toBe('arn:aws:iam::123456789012:role/github-actions');
   });
 
-  test('should handle npm as package manager', () => {
+  it('should handle npm as package manager', () => {
     getInputMock.mockReturnValueOnce('npm');
     
     const packageManagerInput = core.getInput('package-manager', { required: false });
