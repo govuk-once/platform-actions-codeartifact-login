@@ -1,4 +1,5 @@
 import * as configModule from './config';
+import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 
 describe('config', () => {
   const originalCwd = process.cwd;

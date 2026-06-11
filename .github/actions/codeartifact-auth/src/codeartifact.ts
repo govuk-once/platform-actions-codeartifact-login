@@ -12,6 +12,7 @@ export interface CodeArtifactCredentials {
 
 export async function getCodeArtifactTokenAndUrl(
   domain: string,
+  repository: string,
   domainOwner: string,
   credentials: AwsCredentials,
   region: string
@@ -41,7 +42,7 @@ export async function getCodeArtifactTokenAndUrl(
   const endpointCommand = new GetRepositoryEndpointCommand({
     domain,
     domainOwner,
-    repository: 'npm',
+    repository,
     format: 'npm'
   });
 
