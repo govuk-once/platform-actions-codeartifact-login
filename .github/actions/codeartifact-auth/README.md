@@ -53,7 +53,7 @@ jobs:
           registry-url: 'https://repo-prod-904690835784.d.codeartifact.eu-west-2.amazonaws.com/npm/registry-prod-repo/'
       
       - name: Configure CodeArtifact auth
-        uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@ce0d38a2fb22c5f6bd8b8764a1572fbc080a52d1
+        uses: govuk-once/platform-actions/.github/actions/codeartifact-auth@b4f8bce4ba09bc31301025ff1a5b5daa4973dee6
         with:
           role-to-assume: arn:aws:iam::01234456789:role/somerole
       
