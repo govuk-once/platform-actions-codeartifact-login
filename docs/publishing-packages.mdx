@@ -1,0 +1,148 @@
+# Publishing packages
+
+This guide explains how to publish packages to the CodeArtifact registry.
+
+
+## Prerequisites
+
+- You have publish (`write`) access to the repository. Confirm with the
+  platform engineering team if you get a `403 Forbidden`.
+- Your package scope (`@gds-once-TEAM`, etc.) is managed within
+  CodeArtifact. You cannot publish a package in a scope that
+  CodeArtifact does not own.
+- Your package name must be unique within the repository.
+- The package lives in its own GitHub repository under the `{team}-pkg-{product-name}`
+  naming convention. Avoid using monorepo or npm workspace setups unless
+  the packages are deeply co-dependent and intrinsically linked.
+
+
+## Step 1 – prepare the package
+
+Ensure your `package.json` has the required fields:
+
+```json
+{
+  "name": "@gds-once-TEAM/utils",
+  "version": "0.1.0",
+  "description": "A shared utility library.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "publish": "pnpm publish"
+  }
+}
+```
+
+Key points:
+
+- `"name"` must include the organisation scope.
+- `"version"` must follow [Semantic Versioning][] (e.g. `1.0.0`, `1.0.1`,
+  `1.1.0`). **You cannot overwrite a version.**
+
+[Semantic Versioning]: https://semver.org/
+
+
+## Step 2 – build
+
+```bash
+npm run build
+```
+
+Ensure the build output directory (usually `dist/`) exists. pnpm cannot
+publish empty directories.
+
+
+## Step 3 – publish
+
+```bash
+pnpm publish
+```
+
+If your `.npmrc` does not automatically route your scoped package to
+CodeArtifact, specify the registry explicitly:
+
+```bash
+pnpm publish \
+  --registry=https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/
+```
+
+
+## Step 4 – verify
+
+```bash
+pnpm view @gds-once-TEAM/utils version
+# Should return the version you just published
+```
+
+Or check the CodeArtifact console under **Packages > \<repository>** to
+confirm the package appears with the correct version.
+
+
+## Updating a package
+
+Because npm versions must be unique, always increment the version
+string:
+
+```bash
+# Bump patch version
+pnpm version patch   # 0.1.0 -> 0.1.1
+
+# Or bump minor version
+pnpm version minor   # 0.1.0 -> 0.2.0
+
+# Then publish
+pnpm publish
+```
+
+
+## Dry-run (recommended for first-time publishers)
+
+Test a publish without actually uploading:
+
+```bash
+pnpm publish --dry-run
+```
+
+This validates the package contents without writing anything to the
+repository.
+
+
+## Including only necessary files
+
+By default pnpm publishes everything except what is listed in a
+`.npmignore` or excluded via `package.json`'s `"files"` field.
+
+To publish only specific files:
+
+```json
+{
+  "name": "@gds-once-TEAM/utils",
+  "version": "1.0.0",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}
+```
+
+Recommended `.npmignore` contents:
+
+```
+node_modules/
+src/
+*.tsbuildinfo
+*.log
+coverage/
+.env*
+```
+
+
+## Troubleshooting publish failures
+
+| Error                      | Cause                                           | Fix                                                   |
+|----------------------------|-------------------------------------------------|-------------------------------------------------------|
+| `403 Forbidden`            | No publish / write permission                   | Contact IAM admin or platform engineering              |
+| `E409 Conflict`            | Version already exists                          | Bump the version in `package.json`                     |
+| `E400 Bad Request`         | Invalid package name (missing scope?)           | Ensure the package name includes the organisation scope|
+| `E401 Unauthorized`        | Token expired or not logged in                  | Re-run `aws codeartifact login`                        |
