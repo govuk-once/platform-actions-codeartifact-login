@@ -1,0 +1,38 @@
+# CodeArtifact onboarding – overview
+
+This document explains how to use the platform's private npm registry,
+which is hosted on [AWS CodeArtifact][].
+
+
+## Why a private registry?
+
+- Packages containing internal or proprietary code are kept inside the
+  corporate network and AWS VPC.
+- Version control, access control, and audit logs are managed centrally.
+- Teams can share internal utility packages without exposing them to the
+  public npm registry.
+- Pull-Through caching contributes to preventing supply-chain poisoning and
+  makes pipelines resilient even in the event of upstream outages.
+- Identified high-priority CVE notifications can be used to ban specific
+  packages/package-versions division-wide.
+
+
+## Key terms
+
+| Term                 | Description                                                               |
+|-----------------------|---------------------------------------------------------------------------|
+| **Domain**            | A top-level namespace inside CodeArtifact (e.g. `registry-prod`).         |
+| **Repository**        | A registry within a domain (e.g. `registry-prod-repo`).                   |
+| **Package group**     | A logical grouping of packages for easier access management.              |
+| **Package**           | A single npm package (e.g. `@@gds-once-TEAM`).                             |
+
+
+## Where to find help
+
+| Resource                                   | Link                                      |
+|--------------------------------------------|-------------------------------------------|
+| CodeArtifact console                       | https://`<region>`.console.aws.amazon.com |
+| Platform engineering Slack                 | `#govuk-once-platform-public`             |
+
+<!-- LINKS -->
+[AWS CodeArtifact]: https://docs.aws.amazon.com/codeartifact/latest/ug/what-is-codeartifact.html
