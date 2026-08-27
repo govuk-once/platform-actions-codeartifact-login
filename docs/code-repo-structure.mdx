@@ -8,6 +8,11 @@ can contribute, reference, or clone it locally.
 
 ```
 platform-docs-codeartifact/
+├─ .github/ 
+│  └─ actions/codeartifact-auth
+│    ├─ dist/                    # Rendered JS executed as the composite action
+│    ├─ src/                     # Typescript tooling to wrap AWS API commands 
+│    └─ action.yml               # Reusable Action that assumes a GH OIDC role and acquires a token
 ├─ docs/                         # All onboarding and reference docs
 │  ├─ onboarding-overview.mdx    # High-level introduction
 │  ├─ onboarding-prerequisites.mdx
