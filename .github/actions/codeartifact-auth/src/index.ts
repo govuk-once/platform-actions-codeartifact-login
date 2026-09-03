@@ -53,7 +53,7 @@ async function run(): Promise<void> {
     
     core.setOutput('registry-url', registryUrl);
     core.setOutput('auth-token', authToken);
-    core.setOutput('npmrc', npmrcContents)
+    core.setOutput('npmrc-contents', npmrcContents)
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
