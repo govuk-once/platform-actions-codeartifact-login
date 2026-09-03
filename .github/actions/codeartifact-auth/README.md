@@ -29,7 +29,8 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 ### Output Variables
 
 - `registry-url`: CodeArtifact registry URL
-- `auth-token`: Authorization token (truncated for security)
+- `auth-token`: Authorization token
+- `npmrc-contents`: Assembled CodeArtifact + token
 
 ## Setup
 

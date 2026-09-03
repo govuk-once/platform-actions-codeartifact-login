@@ -5,7 +5,7 @@ export async function configurePackageManager(
   packageManager: 'npm' | 'pnpm',
   registryUrl: string,
   authToken: string
-): Promise<void> {
+): Promise<string> {
   const workingDirectory = process.cwd();
   const npmrcContent = generateNpmrcContent(registryUrl, authToken);
   const npmrcPath = path.join(workingDirectory, '.npmrc');
@@ -25,6 +25,7 @@ export async function configurePackageManager(
       throw new Error(`Failed to write .pnpmrc: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+  return npmrcContent
 }
 
 export function generateNpmrcContent(registryUrl: string, authToken: string): string {

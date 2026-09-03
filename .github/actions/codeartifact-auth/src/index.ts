@@ -48,11 +48,12 @@ async function run(): Promise<void> {
   
     core.info(`Successfully obtained CodeArtifact token and registry URL: ${registryUrl.substring(0, 8)}...`);
     
-    await configurePackageManager(inputs.packageManager, registryUrl, authToken);
+    const npmrcContents = await configurePackageManager(inputs.packageManager, registryUrl, authToken);
     core.info(`Successfully configured ${inputs.packageManager} authentication`);
     
     core.setOutput('registry-url', registryUrl);
-    core.setOutput('auth-token', authToken.substring(0, 8) + '...');
+    core.setOutput('auth-token', authToken);
+    core.setOutput('npmrc', npmrcContents)
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
