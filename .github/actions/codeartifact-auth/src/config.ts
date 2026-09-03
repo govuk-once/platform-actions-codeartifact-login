@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as core from '@actions/core';
 
 export async function configurePackageManager(
   registryUrl: string,
@@ -17,7 +18,7 @@ export async function configurePackageManager(
   } catch (error) {
     throw new Error(`Failed to write .npmrc: ${error instanceof Error ? error.message : String(error)}`);
   }
-
+  core.info('Wrote .npmrc to: ' + npmrcPath);
   return npmrcContent
 }
 
