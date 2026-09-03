@@ -2,14 +2,14 @@ import * as configModule from './config';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 
 describe('config', () => {
-  const originalCwd = process.cwd;
+  const originalGws = process.env.GITHUB_WORKSPACE;
 
   beforeEach(() => {
-    process.cwd = jest.fn(() => '/tmp/test');
+    process.env.GITHUB_WORKSPACE = '/tmp/test';
   });
 
   afterEach(() => {
-    process.cwd = originalCwd;
+    process.env.GITHUB_WORKSPACE = originalGws;
     jest.clearAllMocks();
   });
 

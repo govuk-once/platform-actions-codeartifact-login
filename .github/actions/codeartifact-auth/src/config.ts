@@ -5,7 +5,10 @@ export async function configurePackageManager(
   registryUrl: string,
   authToken: string
 ): Promise<string> {
-  const workingDirectory = process.cwd();
+  const workingDirectory = process.env.GITHUB_WORKSPACE;
+  if (!workingDirectory) {
+    throw new Error('GITHUB_WORKSPACE environment variable is not set');
+  }
   const npmrcContent = generateNpmrcContent(registryUrl, authToken);
   const npmrcPath = path.join(workingDirectory, '.npmrc');
   
