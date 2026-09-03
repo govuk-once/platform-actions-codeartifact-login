@@ -2,14 +2,14 @@ import * as configModule from './config';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 
 describe('config', () => {
-  const originalCwd = process.cwd;
+  const originalGws = process.env.GITHUB_WORKSPACE;
 
   beforeEach(() => {
-    process.cwd = jest.fn(() => '/tmp/test');
+    process.env.GITHUB_WORKSPACE = '/tmp/test';
   });
 
   afterEach(() => {
-    process.cwd = originalCwd;
+    process.env.GITHUB_WORKSPACE = originalGws;
     jest.clearAllMocks();
   });
 
@@ -19,7 +19,8 @@ describe('config', () => {
       const authToken = 'auth-token-123';
       const content = configModule.generateNpmrcContent(registryUrl, authToken);
 
-      expect(content).toContain('registry.example.com:_authToken=auth-token-123');
+      expect(content).toContain('//registry.example.com/:_authToken=auth-token-123');
+      expect(content).toContain('registry=https://registry.example.com');
     });
 
     it('should generate correct npmrc content without protocol', () => {
@@ -27,7 +28,8 @@ describe('config', () => {
       const authToken = 'token-with-special-chars!@#$';
       const content = configModule.generateNpmrcContent(registryUrl, authToken);
 
-      expect(content).toContain('registry.example.com:_authToken=token-with-special-chars!@#$');
+      expect(content).toContain('//registry.example.com/:_authToken=token-with-special-chars!@#$');
+      expect(content).toContain('registry=http://registry.example.com');
     });
 
     it('should append trailing newline', () => {
@@ -39,19 +41,4 @@ describe('config', () => {
     });
   });
 
-  describe('generatePnpmRcContent', () => {
-    it('should generate correct pnpmrc content', () => {
-      const registryUrl = 'https://registry.example.com';
-      const content = configModule.generatePnpmRcContent(registryUrl);
-
-      expect(content).toContain('registry=');
-    });
-
-    it('should append trailing newline', () => {
-      const registryUrl = 'https://registry.example.com';
-      const content = configModule.generatePnpmRcContent(registryUrl);
-
-      expect(content).toMatch(/\n$/);
-    });
-  });
 });

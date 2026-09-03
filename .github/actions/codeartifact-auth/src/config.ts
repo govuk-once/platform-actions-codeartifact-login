@@ -1,12 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as core from '@actions/core';
 
 export async function configurePackageManager(
-  packageManager: 'npm' | 'pnpm',
   registryUrl: string,
   authToken: string
-): Promise<void> {
-  const workingDirectory = process.cwd();
+): Promise<string> {
+  const workingDirectory = process.env.GITHUB_WORKSPACE;
+  if (!workingDirectory) {
+    throw new Error('GITHUB_WORKSPACE environment variable is not set');
+  }
   const npmrcContent = generateNpmrcContent(registryUrl, authToken);
   const npmrcPath = path.join(workingDirectory, '.npmrc');
   
@@ -15,26 +18,17 @@ export async function configurePackageManager(
   } catch (error) {
     throw new Error(`Failed to write .npmrc: ${error instanceof Error ? error.message : String(error)}`);
   }
-
-  if (packageManager === 'pnpm') {
-    const pnpmRcContent = generatePnpmRcContent(registryUrl);
-    const pnpmrcFilePath = path.join(workingDirectory, '.pnpmrc');
-    try {
-      fs.writeFileSync(pnpmrcFilePath, pnpmRcContent, { mode: 0o644 });
-    } catch (error) {
-      throw new Error(`Failed to write .pnpmrc: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
+  core.info('Wrote .npmrc to: ' + npmrcPath);
+  return npmrcContent
 }
 
 export function generateNpmrcContent(registryUrl: string, authToken: string): string {
   const registryUrlWithoutProtocol = registryUrl.replace(/^https?:\/\//, '');
+  const registryHost = registryUrlWithoutProtocol.split('/')[0];
   
-  return `${registryUrlWithoutProtocol}:_authToken=${authToken}
+  return `registry=${registryUrl}
+//${registryHost}/:_authToken=${authToken}
 `;
 }
 
-export function generatePnpmRcContent(registryUrl: string): string {
-  return `registry=${registryUrl}
-`;
-}
+

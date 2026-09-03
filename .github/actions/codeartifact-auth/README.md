@@ -6,13 +6,12 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 
 ```yaml
 - name: Configure CodeArtifact
-  uses: ./.github/actions/codeartifact-auth
-  with:
-    role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact
-    region: eu-west-2
-    domain: registry-prod
-    domain-owner: 904690835784 
-    package-manager: npm
+   uses: ./.github/actions/codeartifact-auth
+   with:
+     role-to-assume: arn:aws:iam::123456789:role/github-actions-codeartifact
+     aws-region: eu-west-2
+     domain: registry-prod
+     domain-owner: 904690835784
 ```
 
 ### Input Parameters
@@ -20,16 +19,16 @@ This GitHub Action provides seamless authentication to AWS CodeArtifact using Gi
 | Parameter | Required | Description | Default |
 |-----------|----------|-------------|---------|
 | `role-to-assume` | Yes | AWS IAM role ARN with CodeArtifact permissions | None |
-| `region` | No | AWS region | `eu-west-2` |
+| `aws-region` | No | AWS region | `eu-west-2` |
 | `codeartifact-domain` | No | CodeArtifact domain name | `registry-prod` |
 | `codeartifact-repository` | No | CodeArtifact Repository name  | `registry-prod-repo` |
 | `codeartifact-domain-owner` | No | AWS account ID that owns the domain | `904690835784` |
-| `package-manager` | No | Package manager (`npm` or `pnpm`) | `npm` |
 
 ### Output Variables
 
 - `registry-url`: CodeArtifact registry URL
-- `auth-token`: Authorization token (truncated for security)
+- `auth-token`: Authorization token
+- `npmrc-contents`: Assembled CodeArtifact + token
 
 ## Setup
 
