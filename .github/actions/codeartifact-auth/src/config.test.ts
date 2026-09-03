@@ -19,7 +19,9 @@ describe('config', () => {
       const authToken = 'auth-token-123';
       const content = configModule.generateNpmrcContent(registryUrl, authToken);
 
-      expect(content).toContain('registry.example.com:_authToken=auth-token-123');
+      expect(content).toContain('//registry.example.com/:_authToken=auth-token-123');
+      expect(content).toContain('registry=https://registry.example.com');
+      expect(content).toContain('always-auth=true');
     });
 
     it('should generate correct npmrc content without protocol', () => {
@@ -27,7 +29,9 @@ describe('config', () => {
       const authToken = 'token-with-special-chars!@#$';
       const content = configModule.generateNpmrcContent(registryUrl, authToken);
 
-      expect(content).toContain('registry.example.com:_authToken=token-with-special-chars!@#$');
+      expect(content).toContain('//registry.example.com/:_authToken=token-with-special-chars!@#$');
+      expect(content).toContain('registry=http://registry.example.com');
+      expect(content).toContain('always-auth=true');
     });
 
     it('should append trailing newline', () => {

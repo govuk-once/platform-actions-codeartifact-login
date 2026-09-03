@@ -30,8 +30,11 @@ export async function configurePackageManager(
 
 export function generateNpmrcContent(registryUrl: string, authToken: string): string {
   const registryUrlWithoutProtocol = registryUrl.replace(/^https?:\/\//, '');
+  const registryHost = registryUrlWithoutProtocol.split('/')[0];
   
-  return `${registryUrlWithoutProtocol}:_authToken=${authToken}
+  return `registry=${registryUrl}
+//${registryHost}/:_authToken=${authToken}
+always-auth=true
 `;
 }
 
