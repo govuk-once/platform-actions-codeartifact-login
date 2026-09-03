@@ -1,10 +1,6 @@
 name: 'CodeArtifact Authentication'
 description: 'Authenticate with AWS CodeArtifact using GitHub OIDC token'
 inputs:
-  package-manager:
-    description: 'Package manager to configure (npm or pnpm)'
-    required: false
-    default: 'pnpm'
   codeartifact-domain:
     description: 'CodeArtifact domain name'
     required: false

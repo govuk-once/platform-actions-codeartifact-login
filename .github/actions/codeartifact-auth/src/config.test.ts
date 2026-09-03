@@ -41,22 +41,4 @@ describe('config', () => {
     });
   });
 
-  describe('generatePnpmRcContent', () => {
-    it('should generate correct pnpmrc content with auth', () => {
-      const registryUrl = 'https://registry.example.com';
-      const authToken = 'auth-token-123';
-      const content = configModule.generatePnpmRcContent(registryUrl, authToken);
-
-      expect(content).toContain('registry=');
-      expect(content).toContain('//registry.example.com/:_authToken=auth-token-123');
-    });
-
-    it('should append trailing newline', () => {
-      const registryUrl = 'https://registry.example.com';
-      const authToken = 'token123';
-      const content = configModule.generatePnpmRcContent(registryUrl, authToken);
-
-      expect(content).toMatch(/\n$/);
-    });
-  });
 });
