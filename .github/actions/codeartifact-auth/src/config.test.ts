@@ -21,7 +21,6 @@ describe('config', () => {
 
       expect(content).toContain('//registry.example.com/:_authToken=auth-token-123');
       expect(content).toContain('registry=https://registry.example.com');
-      expect(content).toContain('always-auth=true');
     });
 
     it('should generate correct npmrc content without protocol', () => {
@@ -31,7 +30,6 @@ describe('config', () => {
 
       expect(content).toContain('//registry.example.com/:_authToken=token-with-special-chars!@#$');
       expect(content).toContain('registry=http://registry.example.com');
-      expect(content).toContain('always-auth=true');
     });
 
     it('should append trailing newline', () => {
@@ -44,16 +42,19 @@ describe('config', () => {
   });
 
   describe('generatePnpmRcContent', () => {
-    it('should generate correct pnpmrc content', () => {
+    it('should generate correct pnpmrc content with auth', () => {
       const registryUrl = 'https://registry.example.com';
-      const content = configModule.generatePnpmRcContent(registryUrl);
+      const authToken = 'auth-token-123';
+      const content = configModule.generatePnpmRcContent(registryUrl, authToken);
 
       expect(content).toContain('registry=');
+      expect(content).toContain('//registry.example.com/:_authToken=auth-token-123');
     });
 
     it('should append trailing newline', () => {
       const registryUrl = 'https://registry.example.com';
-      const content = configModule.generatePnpmRcContent(registryUrl);
+      const authToken = 'token123';
+      const content = configModule.generatePnpmRcContent(registryUrl, authToken);
 
       expect(content).toMatch(/\n$/);
     });

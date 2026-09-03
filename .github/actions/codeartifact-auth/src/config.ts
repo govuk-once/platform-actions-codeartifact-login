@@ -17,7 +17,7 @@ export async function configurePackageManager(
   }
 
   if (packageManager === 'pnpm') {
-    const pnpmRcContent = generatePnpmRcContent(registryUrl);
+    const pnpmRcContent = generatePnpmRcContent(registryUrl, authToken);
     const pnpmrcFilePath = path.join(workingDirectory, '.pnpmrc');
     try {
       fs.writeFileSync(pnpmrcFilePath, pnpmRcContent, { mode: 0o644 });
@@ -34,11 +34,14 @@ export function generateNpmrcContent(registryUrl: string, authToken: string): st
   
   return `registry=${registryUrl}
 //${registryHost}/:_authToken=${authToken}
-always-auth=true
 `;
 }
 
-export function generatePnpmRcContent(registryUrl: string): string {
+export function generatePnpmRcContent(registryUrl: string, authToken: string): string {
+  const registryUrlWithoutProtocol = registryUrl.replace(/^https?:\/\//, '');
+  const registryHost = registryUrlWithoutProtocol.split('/')[0];
+  
   return `registry=${registryUrl}
+//${registryHost}/:_authToken=${authToken}
 `;
 }
