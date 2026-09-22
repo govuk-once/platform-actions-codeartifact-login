@@ -4,7 +4,6 @@ import { getCodeArtifactTokenAndUrl } from './codeartifact';
 import { configurePackageManager } from './config';
 
 export interface ActionInputs {
-  packageManager: 'npm' | 'pnpm';
   codeartifactDomain: string;
   codeartifactRepository: string;
   codeartifactDomainOwner: string;
@@ -13,13 +12,9 @@ export interface ActionInputs {
 }
 
 function parseInputs(): ActionInputs {
-  const packageManagerInput = core.getInput('package-manager', { required: false });
-  const packageManager = packageManagerInput === 'pnpm' ? 'pnpm' : 'npm';
-  
   const awsRegion = core.getInput('aws-region', { required: false });
   
   return {
-    packageManager,
     codeartifactDomain: core.getInput('codeartifact-domain', { required: false }) || 'registry-prod',
     codeartifactRepository: core.getInput('codeartifact-repository', { required: false }) || 'npm',
     codeartifactDomainOwner: core.getInput('codeartifact-domain-owner', { required: true }),
@@ -48,11 +43,12 @@ async function run(): Promise<void> {
   
     core.info(`Successfully obtained CodeArtifact token and registry URL: ${registryUrl.substring(0, 8)}...`);
     
-    await configurePackageManager(inputs.packageManager, registryUrl, authToken);
-    core.info(`Successfully configured ${inputs.packageManager} authentication`);
+    const npmrcContents = await configurePackageManager(registryUrl, authToken);
+    core.info('Successfully configured CodeArtifact authentication');
     
     core.setOutput('registry-url', registryUrl);
-    core.setOutput('auth-token', authToken.substring(0, 8) + '...');
+    core.setOutput('auth-token', authToken);
+    core.setOutput('npmrc-contents', npmrcContents)
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
