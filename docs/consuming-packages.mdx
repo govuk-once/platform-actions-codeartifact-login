@@ -1,0 +1,137 @@
+# Consuming packages
+
+This guide explains how to install and use packages published to the
+CodeArtifact registry.
+
+
+## Basic installation
+
+Once your registry is configured (see Authentication and Configure pnpm
+guides), install a package from the private registry just like any
+public pnpm package:
+
+```bash
+pnpm install @gds-once-someteam/utils
+```
+
+pnpm resolves the scope (`@gds-once-someteam`) to the CodeArtifact URL defined in
+your `.npmrc`.
+
+
+## Adding as a development dependency
+
+For tooling used only during development (e.g. shared linting configs):
+
+```bash
+pnpm add -D @gds-once-somesometeam/webpack-config
+```
+
+For runtime dependencies:
+
+```bash
+pnpm add @gds-once-someteam/utils
+```
+
+
+## Updating an existing package
+
+```bash
+# Update all dependencies to their latest versions
+pnpm update @gds-once-someteam/utils
+
+# Pin to a specific major version
+pnpm install @gds-once-someteam/utils@^2.1.0
+
+# Pin to an exact version
+pnpm install @gds-once-someteam/utils@2.1.3
+```
+
+
+## Lock files
+
+pnpm generates and uses a `pnpm-lock.yaml` file automatically.
+Never edit this file by hand — always reinstall after pulling changes:
+
+```bash
+pnpm install
+```
+
+This is critical in CI where `pnpm install` (equivalent to `npm ci`) is
+expected by default.
+
+
+## Private packages with dependencies
+
+Packages should be created in isolation — one repository per package.
+Packages should only be deeply co-dependent when strictly necessary.
+
+When they do have dependencies on other internal packages, pnpm resolves
+them automatically, provided the registry is configured.
+
+Example: the package `{someteam}-pkg-core` depends on `{someteam}-pkg-utils`:
+
+```json
+{
+  "name": "@gds-once-someteam/core",
+  "version": "1.0.0",
+  "dependencies": {
+    "@gds-once-someteam/utils": "^1.2.0"
+  }
+}
+```
+
+A package repository should follow the structure:
+
+```
+{someteam}-pkg-{component-name}/
+├── package.json
+├── src/
+├── dist/
+├── pnpm-lock.yaml
+├── README.md
+└── .npmignore
+```
+
+Publish the package independently — do not use an internal workspace or
+monorepo setup unless justified.
+
+
+## Using a package in your code
+
+```typescript
+import { doSomething } from "@gds-once-someteam/utils";
+
+doSomething();
+```
+
+
+## Migrating dependencies from the public registry
+
+If a package was previously installed from the public `registry.npmjs.org`
+and you move the scope under CodeArtifact:
+
+1. Update the package name in `package.json`.
+2. Remove the existing `node_modules` entry and lock file:
+   ```bash
+   rm -rf node_modules pnpm-lock.yaml
+   ```
+3. Run:
+   ```bash
+   pnpm install
+   ```
+
+This prevents pnpm from attempting to fetch the package from both
+registries.
+
+
+## Multiple registries
+
+If you need to access both CodeArtifact (private) and the public
+registry in the same project, ensure your `.npmrc` includes both entries.
+pnpm resolves `@gds-once-someteam/*` packages to CodeArtifact and all other
+packages to the public registry:
+
+```ini
+@gds-once-someteam:registry=https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/
+registry=https://registry.npmjs.org/
+```

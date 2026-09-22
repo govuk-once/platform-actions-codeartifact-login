@@ -1,0 +1,85 @@
+# Prerequisites
+
+This section covers everything you need before connecting to the private
+pnpm registry hosted on CodeArtifact.
+
+
+## Minimum software versions
+
+| Tool          | Minimum version | Notes                                    |
+|---------------|-----------------|------------------------------------------|
+| Node.js       | 20.x            | LTS recommended (used for Lambda runtime)|
+| pnpm          | 8.x+            | Package manager                          |
+| AWS CLI       | 2.x             | Required for authentication              |
+| macOS         | 13+ (Ventura)   | ARM (Apple Silicon) is fully supported   |
+| gds-cli       | Latest          | Only required to bootstrap AWS login     |
+
+
+## Install the AWS CLI v2
+
+```bash
+brew install aws-cli
+```
+
+
+## Install pnpm
+
+```bash
+brew install pnpm
+```
+
+
+## Verify the installation
+
+```bash
+aws --version
+# Expected output: aws-cli/2.x.x Python/x.x.x ...
+
+pnpm --version
+# Expected output: 8.x.x or higher
+```
+
+
+## IAM requirements
+
+As a rule-of-thumb, accounts provisioned by the gds-once Platform Team will be set up correctly to access
+code-artifact.
+
+Your IAM principal must have at least the following inline policy or
+managed policy attached:
+
+```json
+{
+  "Version": "2024-12-19",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codeartifact:GetAuthorizationToken",
+        "codeartifact:GetPackageGroupName",
+        "codeartifact:ReadFromRepository"
+      ],
+      "Resource": "arn:aws:codeartifact:<region>:<account-id>:domain/<domain-name>"
+    }
+  ]
+}
+```
+
+Contact your IAM administrator or the platform engineering team if you do
+not have these permissions.
+
+
+## SSH / Git access
+
+If your workspace uses private git submodules or dependencies fetched via
+SSH, verify your SSH key is loaded:
+
+```bash
+ssh-add -l
+```
+
+If no key is listed, add it:
+
+```bash
+ssh-add ~/.ssh/<your-key>
+```

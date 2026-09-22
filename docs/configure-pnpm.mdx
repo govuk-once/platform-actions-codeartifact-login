@@ -1,0 +1,91 @@
+# Configure pnpm
+
+This document covers the different ways to point pnpm at the CodeArtifact
+registry depending on your needs.
+
+pnpm reads `.npmrc` files natively, so the same `.npmrc` approach used
+with npm or pnpm works identically.
+
+
+## Option 1 – let `aws codeartifact login` handle it (strongly recommended)
+
+Running `aws codeartifact login` (see the Authentication setup guide)
+automatically reads and writes the correct `.npmrc` entries for you.
+
+
+## Option 2 – producing-team scoped per-project `.npmrc`
+
+Create a `.npmrc` file inside the root of your project with the
+following contents:
+
+```ini
+@gds-once-someteam:registry=https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/
+```
+
+To add a second registry for unscoped packages (e.g. to keep fetching
+from the public registry):
+
+```ini
+@gds-once-someteam:registry=https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/
+registry=https://registry.npmjs.org/
+```
+
+pnpm reads `.npmrc` files in a cascading manner, so a project-level file
+overrides a user-level file in `~/.npmrc`.
+
+
+## Option 3 – user-level `.npmrc` (affects all projects)
+
+```bash
+npm config set @gds-once-TEAM:registry https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/
+```
+
+This writes to `~/.npmrc` and applies to every project on the machine.
+
+
+## pnpm-specific configuration
+
+If your team uses [pnpm workspaces][] for development, create a
+`pnpm-workspace.yaml` in the repository root:
+
+```yaml
+packages:
+  - "packages/*"
+```
+
+This is only needed during development — published packages remain
+standalone repositories (see the publishing guide).
+
+
+## Common pitfalls
+
+- **`ERR_NOCONFIG`** — pnpm cannot find a `.npmrc`. Make sure the file
+  is in the same directory as `package.json` or in `~/.npmrc`.
+
+- **Registry mismatch** — if a package was originally published under a
+  different registry URL, running `pnpm install` may try to fetch it from
+  the wrong source. Use `pnpm store path --silent` to locate the pnpm
+  cache and remove stale entries after switching registries.
+
+- `.gitignore` the `node_modules/` directory but **do** commit `.npmrc`
+  if it contains registry configuration (no secrets).
+
+- **pnpm strict peers** — pnpm enforces peer dependencies more rigidly
+  than npm. If you encounter resolution errors during `pnpm install`,
+  try:
+  ```bash
+  pnpm install --strict-peer-dependencies=false
+  ```
+
+[pnpm workspaces]: https://pnpm.io/workspaces
+
+
+## Quick-reference commands
+
+| Goal                               | Command                                                                                         |
+|------------------------------------|-------------------------------------------------------------------------------------------------|
+| Show current registry config       | `pnpm config list -l`                                                                            |
+| Set scoped registry                | `npm config set @gds-once-TEAM:registry https://...`                                             |
+| Delete scoped registry             | `npm config delete @gds-once-TEAM:registry`                                                      |
+| List effective config for a pkg    | `pnpm view @gds-once-TEAM/utils --json`                                                          |
+| Show pnpm cache location           | `pnpm store path --silent`                                                                       |

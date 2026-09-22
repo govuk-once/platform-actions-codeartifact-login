@@ -1,0 +1,123 @@
+# Troubleshooting
+
+This section lists the most common problems teams encounter when working
+with the CodeArtifact registry and how to resolve them.
+
+
+## Error: `401 Unauthorized` on install or publish
+
+**Cause:** The CodeArtifact auth token has expired (tokens are valid for
+12 hours) or the login command was never run.
+
+**Fix:**
+
+```bash
+aws codeartifact login \
+  --domain registry-prod \
+  --domain-owner 904690835784 \
+  --repository registry-prod-repo \
+  --scope @gds-once-someteam
+```
+
+Then re-run your pnpm command.
+
+
+## Error: `403 Forbidden`
+
+**Cause:** The IAM principal associated with your AWS credentials does not
+have permission to `ReadFromRepository` (install) or `PublishPackageVersion`
+(publish) on the repository.
+
+**Fix:** Contact your IAM administrator or the platform engineering team
+with your account ID, asking for the appropriate `codeartifact` policy to
+be attached to your role.
+
+
+## Error: `E404 Package not found`
+
+**Cause:** The package either does not exist in the repository, or it was
+published under a different scope or registry URL.
+
+**Fix:**
+
+1. Verify the exact package name (including scope) at the
+   [CodeArtifact console][].
+2. Make sure your `.npmrc` registry URL is correct and includes the
+   organisation scope.
+3. Check that you are using the correct repository name.
+
+[codeartifact console]: https://eu-west-2.console.aws.amazon.com/codesuite/codeartifact/home
+
+
+## Error: `ENOENT` after switching registries
+
+**Cause:** pnpm cached metadata from a previous registry (usually the
+public `registry.npmjs.org`).
+
+**Fix:**
+
+```bash
+rm -rf node_modules pnpm-lock.yaml
+pnpm store prune
+pnpm install
+```
+
+
+## Error: `ETARGET` or `EEXIST`
+
+**Cause:** Version mismatch — the requested version does not exist or
+already exists in the target registry.
+
+**Fix:**
+
+- Install: verify the version exists on CodeArtifact.
+- Publish: increment the version in `package.json`.
+
+
+## Error: `ERESOLVE` (peer dependency conflict)
+
+**Cause:** A peer dependency of a package in the private registry is
+satisfied by a version that conflicts with another package in your
+project.
+
+**Fix:**
+
+```bash
+# Allow pnpm to hoist and deduplicate peer dependencies
+pnpm install --no-strict-peer-dependencies
+```
+
+
+## Debug mode
+
+Add the `--loglevel=silly` flag to see verbose diagnostic output:
+
+```bash
+pnpm install --loglevel=silly 2>&1 | tee pnpm-debug.log
+```
+
+Then search `pnpm-debug.log` for `ERR` or `code=` to pinpoint the
+problematic line.
+
+
+## Commonly helpful commands
+
+| Goal                                       | Command                                                      |
+|--------------------------------------------|--------------------------------------------------------------|
+| Check current pnpm registry config         | `pnpm config list -l`                                       |
+| Prune the pnpm store (cache)               | `pnpm store prune`                                           |
+| Show where a scoped package resolves to    | `pnpm view @gds-once-TEAM/utils --json | grep registry`      |
+| See which version is locked                | `pnpm ls @gds-once-TEAM/utils`                               |
+| Validate your local codeartifact login     | `pnpm info @gds-once-TEAM/utils version`                     |
+| Delete all local pnpm caches               | `rm -rf ~/.local/share/pnpm/store ~/.pnpm-store`             |
+
+
+## Still stuck?
+
+Collect the following and ask in [`#govuk-once-platform-public`](https://slack.com/channels/govuk-once-platform-public):
+
+1. Your OS and Node.js version (`node -v`).
+2. pnpm version (`pnpm --version`).
+3. `aws --version`.
+4. `pnpm config list -l` output.
+5. The output of `pnpm install --loglevel=silly 2>&1`.

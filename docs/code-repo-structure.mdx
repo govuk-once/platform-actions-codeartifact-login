@@ -1,0 +1,59 @@
+# Documentation structure
+
+This document describes the layout of this documentation repository so you
+can contribute, reference, or clone it locally.
+
+
+## Directory layout
+
+```
+platform-docs-codeartifact/
+├─ .github/ 
+│  └─ actions/codeartifact-auth
+│    ├─ dist/                    # Rendered JS executed as the composite action
+│    ├─ src/                     # Typescript tooling to wrap AWS API commands 
+│    └─ action.yml               # Reusable Action that assumes a GH OIDC role and acquires a token
+├─ docs/                         # All onboarding and reference docs
+│  ├─ onboarding-overview.mdx    # High-level introduction
+│  ├─ onboarding-prerequisites.mdx
+│  ├─ authentication-setup.mdx
+│  ├─ configure-pnpm.mdx
+│  ├─ publishing-packages.mdx
+│  ├─ consuming-packages.mdx
+│  ├─ troubleshooting.mdx
+│  └─ ...
+├─ README.md
+└─ ...
+```
+
+
+## Choosing the right file
+
+| Your goal                                                          | Read / edit                         |
+|--------------------------------------------------------------------|-------------------------------------|
+| Understand what CodeArtifact is and why we use it                  | `docs/onboarding-overview.mdx`      |
+| Check that you have the right tools and permissions                | `docs/onboarding-prerequisites.mdx` |
+| Log in from macOS or a CI pipeline                                 | `docs/authentication-setup.mdx`     |
+| Make pnpm point at the private registry (globally, per-project, …) | `docs/configure-pnpm.mdx`           |
+| Publish a new package or update an existing one                    | `docs/publishing-packages.mdx`      |
+| Install or update a package from the private registry              | `docs/consuming-packages.mdx`       |
+| Fix common errors (401, 403, network timeouts…)                    | `docs/troubleshooting.mdx`          |
+
+
+## Contributing
+
+1. Fork and clone this repository.
+2. Create a branch: `git checkout -b docs/<topic>`.
+3. Edit the relevant `.mdx` file under `docs/`.
+4. Commit your changes (Conventional Commits preferred).
+5. Submit a pull request.
+
+Style guide:
+
+- Use ATX-style headers (`## Header`).
+- Keep line length at ~100 characters.
+- Wrap code blocks in triple backticks and prefix with the language name.
+- Use [reference-style links][].
+- Add a blank line between blocks.
+
+[reference-style links]: https://www.markdownguide.org/basic-syntax/#reference-style-links

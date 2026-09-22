@@ -1,0 +1,103 @@
+# Authentication setup
+
+Before you can read from or publish to CodeArtifact, your machine must
+be authenticated to AWS.
+
+**You must be authenticated with `gds-cli` before running the command below.**
+See the [gds-cli documentation][].
+
+Ask in [`#govuk-once-platform-public`](https://gds.slack.com/archives/C09U68A5Z7U) for help getting access.
+
+[gds-cli documentation]: https://github.com/alphagov/gds-cli
+
+> Authentication tokens are valid for 12 hours after log-in.
+
+
+## TL;DR
+
+```bash
+aws codeartifact login --tool pnpm \
+  --repository registry-prod-repo \
+  --domain registry-prod \
+  --domain-owner 904690835784 \
+  --region eu-west-2
+```
+
+
+## Quick reference – variables
+
+| Placeholder            | Example                       | Where to find it                                        |
+|-------------------------|------------------------------|---------------------------------------------------------|
+| `<TOOL>`                | `pnpm`                       | Your local environment                                  |
+| `<DOMAIN>`              | `registry-prod`              | Infra-Lib-Prod > CodeArtifact > Domains in the console  |
+| `<REPOSITORY>`          | `registry-prod-repo`         | Infra-Lib-Prod > CodeArtifact > Repositories            |
+| `<REGION>`              | `eu-west-2`                  | Same page as repository URL                             |
+| `<ACCOUNT-ID>`          | `904690835784`               | Infra-Lib-Prod                                          |
+
+
+## Authenticate on macOS (development machine)
+
+Run the following command, substituting the values from the table above:
+
+```bash
+aws codeartifact login \
+  --tool <TOOL> \
+  --domain <DOMAIN> \
+  --domain-owner <ACCOUNT-ID> \
+  --repository <REPOSITORY> \
+  --scope @gds-once-{owning-team-name} // Only necessary if you wish to specify specific scoped packages (not recommended)
+```
+
+What this does:
+
+1. Calls `GetAuthorizationToken` to obtain a temporary token.
+2. Appends a `.npmrc` entry to your home directory (`~/.npmrc`).
+3. Makes all `@gds-once-{owning-team-name}` scoped packages resolve to CodeArtifact.
+
+Verify it worked:
+
+```bash
+pnpm config get registry
+# Should output a CodeArtifact URL
+```
+
+
+## Authenticate for an unscoped (global) registry
+
+If you prefer every package (not just `@gds-once-{specific-team}` scoped ones) to
+resolve to CodeArtifact:
+
+```bash
+# Create the file manually (the command above already does this for scoped).
+echo 'registry=https://<domain>-<account-id>.d.codeartifact.<region>.amazonaws.com/npm/<repository>/' >> ~/.npmrc
+```
+
+> **Warning:** Using a global registry means pnpm will no longer reach out
+> to the public `registry.npmjs.org` unless a `.npmrc` with a different
+> registry is present in a specific project directory.
+
+
+## Authenticate inside a CI pipeline (GitHub Actions)
+
+Use the [shared GitHub Action][] to handle authentication automatically:
+
+```yaml
+- name: Configure CodeArtifact
+  uses: ./.github/actions/codeartifact-auth
+  with:
+    role-to-assume: {{ path.to.variable.for.role.to.assume }} // eg arn:aws:iam::123456789:role/github-actions-codeartifact
+```
+
+[shared GitHub Action]: https://github.com/govuk-once/platform-actions-codeartifact-login/tree/main/.github/actions/codeartifact-auth
+
+The action handles AWS authentication, the token exchange, and updating the workflow runner environment's .npmrc transparently.
+
+
+## Logging out
+
+To remove CodeArtifact from your local pnpm configuration:
+
+```bash
+npm config delete @gds-once-TEAM:registry
+npm config delete registry         # if you set a global registry
+```
