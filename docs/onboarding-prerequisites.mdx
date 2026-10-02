@@ -42,8 +42,11 @@ pnpm --version
 
 ## IAM requirements
 
-As a rule-of-thumb, accounts provisioned by the gds-once Platform Team will be set up correctly to access
-code-artifact.
+> As a rule-of-thumb, accounts provisioned by the gds-once Platform Team will be set up correctly to access
+> code-artifact as `read` access is scoped to the entire Once/Connect OU (organization unit).
+> 
+> If your project isn't set up within the OU or you have difficulties connecting please contact the Platform
+> Engineering Team.
 
 Your IAM principal must have at least the following inline policy or
 managed policy attached:
@@ -65,21 +68,3 @@ managed policy attached:
 }
 ```
 
-Contact your IAM administrator or the platform engineering team if you do
-not have these permissions.
-
-
-## SSH / Git access
-
-If your workspace uses private git submodules or dependencies fetched via
-SSH, verify your SSH key is loaded:
-
-```bash
-ssh-add -l
-```
-
-If no key is listed, add it:
-
-```bash
-ssh-add ~/.ssh/<your-key>
-```
