@@ -1,0 +1,77 @@
+name: Sonar Scan
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  sonar:
+    name: SonarCloud Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: development
+
+    defaults:
+      run:
+        working-directory: .github/actions/codeartifact-auth
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b
+        with:
+          version: 11
+          install: false
+          runtime: node@24
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Test
+        run: pnpm run test --runInBand --coverage
+
+      - name: Build
+        run: pnpm run build
+
+      - name: SonarCloud Scan
+        id: sonar-scan
+        continue-on-error: true
+        uses: SonarSource/sonarqube-scan-action@4d1dc0c91ee400dcf8a6dddf2f705ac36542e304 # v8.4.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
+      - name: SonarCloud Security Findings to Jira
+        if: ${{ !cancelled() && steps.sonar-scan.outcome != 'skipped' }}
+        continue-on-error: true
+        env:
+          SONAR_URL: https://sonarcloud.io
+          SONAR_TOKEN_PLATFORM: ${{ secrets.SONAR_TOKEN }}
+          JIRA_URL: ${{ secrets.JIRA_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DRY_RUN: 'false'
+        run: pnpm exec tsx ../../../scripts/sonarToJira.ts
